@@ -230,6 +230,34 @@ def webhook():
 
     return "OK"
 
+
+import threading
+import asyncio
+
+def start_flask():
+    port = int(os.environ.get("PORT", 10000))
+    # Debug выключен, чтобы не конфликтовал с asyncio
+    app.run(host="0.0.0.0", port=port, debug=False)
+
+if __name__ == "__main__":
+    if not RENDER_URL:
+        raise ValueError("❌ RENDER_EXTERNAL_URL не задан")
+
+    print("🚀 STARTING BOT...")
+
+    # Устанавливаем webhook Telegram
+    success = asyncio.run(bot.set_webhook(f"{RENDER_URL}/webhook"))
+    if success:
+        print(f"✅ Webhook установлен: {RENDER_URL}/webhook")
+    else:
+        print("❌ Ошибка при установке webhook")
+
+    # Запускаем Flask в отдельном потоке, чтобы webhook работал параллельно
+    flask_thread = threading.Thread(target=start_flask)
+    flask_thread.start()
+
+    print("🌐 Flask сервер запущен на порту", os.environ.get("PORT", 10000))
+'''
 # ================= ЗАПУСК =================
 if __name__ == "__main__":
     print("🚀 STARTING BOT...")
@@ -243,3 +271,4 @@ if __name__ == "__main__":
     print(f"🌐 PORT: {port}")
 
     app.run(host="0.0.0.0", port=port)
+'''
