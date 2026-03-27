@@ -212,7 +212,7 @@ async def search_name(message: Message, state: FSMContext):
     await message.answer(response)
     log_action(message.from_user.id, "Поиск", query)
     await state.clear()
-
+'''
 @dp.message(F.text == "Логи сотрудников")
 async def logs_start(message: Message, state: FSMContext):
     if message.from_user.id not in boss_ids:
@@ -246,7 +246,7 @@ async def logs_date(message: Message, state: FSMContext):
         await message.answer("\n".join(lines))
 
     await state.clear()
-
+'''
 # ================= WEBHOOK =================
 async def handle(request):
     try:
