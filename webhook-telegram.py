@@ -101,7 +101,8 @@ def boss_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Добавить")],
-            [KeyboardButton(text="Номер банки")]
+            [KeyboardButton(text="Номер банки")],
+            [KeyboardButton(text="Логи сотрудников")]
         ],
         resize_keyboard=True
     )
@@ -181,6 +182,14 @@ async def add_name(message: Message, state: FSMContext):
 @dp.message(F.text == "Номер банки")
 async def search_start(message: Message, state: FSMContext):
     await message.answer("Введите название:")
+    await state.set_state(SearchDrug.name)
+
+@dp.message(F.text == "Номер банки")
+async def search_start(message: Message, state: FSMContext):
+    if message.from_user.id not in boss_ids + worker_ids:
+        return
+
+    await message.answer("Укажите название:")
     await state.set_state(SearchDrug.name)
 
 @dp.message(SearchDrug.name)
