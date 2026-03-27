@@ -213,6 +213,40 @@ async def search_name(message: Message, state: FSMContext):
     log_action(message.from_user.id, "Поиск", query)
     await state.clear()
 
+@dp.message(F.text == "Логи сотрудников")
+async def logs_start(message: Message, state: FSMContext):
+    if message.from_user.id not in boss_ids:
+        return
+
+    await message.answer("Введите дату в формате ГГГГ-ММ-ДД:")
+    await state.set_state(LogsDate.date)
+
+
+@dp.message(LogsDate.date)
+async def logs_date(message: Message, state: FSMContext):
+    date_str = message.text.strip()
+
+    logs = log_sheet.get_all_records()
+    df = pd.DataFrame(logs)
+
+    if df.empty:
+        await message.answer("Логи пустые.")
+        return
+
+    logs_filtered = df[df["datetime"].str.startswith(date_str)]
+
+    if logs_filtered.empty:
+        await message.answer(f"Запросов за {date_str} нет.")
+    else:
+        lines = [
+            f"{row['user_name']} — {row['action']} — {row['query']}"
+            for _, row in logs_filtered.iterrows()
+        ]
+
+        await message.answer("\n".join(lines))
+
+    await state.clear()
+
 # ================= WEBHOOK =================
 async def handle(request):
     try:
